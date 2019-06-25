@@ -26,7 +26,7 @@ namespace WpfApp
 
         // variables
         // array of machine code (to pass into run)
-        
+
 
         // constructor
         public MainWindow()
@@ -35,19 +35,45 @@ namespace WpfApp
 
             InitializeComponent();
         }
-        
+
         private void CompileButton_Click(object sender, RoutedEventArgs e)
         {
-            // initialize lexer, pass InputBox.Text
             
-            outputText += InputBox.Text;
+            Lexer lexer = new Lexer();
 
-            OutputBox.Text = outputText;
+            TokenList tokenList = lexer.Run(InputBox.Text);
+            
+            if (lexer.HasError())
+            {
+                UpdateOutputBox(Constants.LexerErrors[(int)lexer.error]);
+                return;
+            }
+
+            UpdateOutputBox(tokenList.ToString());
+
+            // initialize generator
+            // check if error code
+
+            /*
+            Generator generator = new Generator(tokenList);
+            if (generator.HasError())
+            {
+                // print error
+                return; // terminate
+            }*/
+
         }
 
         private void RunButton_Click(object sender, RoutedEventArgs e)
         {
+            // take array of machine code, run and print output
+        }
 
+        private void UpdateOutputBox(string text)
+        {
+            outputText += text + "\n";
+
+            OutputBox.Text = outputText;
         }
     }
 }

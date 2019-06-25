@@ -70,8 +70,12 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Constants.cs" />
+    <Compile Include="Enums.cs" />
     <Compile Include="Generator.cs" />
+    <Compile Include="Instruction.cs" />
     <Compile Include="Lexer.cs" />
+    <Compile Include="Machine.cs" />
     <Compile Include="Symbol.cs" />
     <Compile Include="SymbolTable.cs" />
     <Compile Include="Token.cs" />

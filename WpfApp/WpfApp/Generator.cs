@@ -10,5 +10,16 @@ namespace WpfApp
 {
     class Generator
     {
+        int error;
+
+        public Generator()
+        {
+
+        }
+
+        public bool HasError()
+        {
+            return (this.error != 0 ? true : false);
+        }
     }
 }

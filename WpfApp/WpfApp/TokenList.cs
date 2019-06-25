@@ -33,14 +33,21 @@ namespace WpfApp
             return (Token)Tokens[iterator];
         }
 
-        public int GetCurrentTokenType()
+        public Enums.TokenType GetCurrentTokenType()
         {
             return GetCurrentToken().id;
         }
 
-        ~TokenList()
+        public override string ToString()
         {
+            StringBuilder sb = new StringBuilder();
 
+            foreach(Token token in Tokens)
+            {
+                sb.Append(token.ToString() + " ");
+            }
+
+            return sb.ToString();
         }
     }
 }
