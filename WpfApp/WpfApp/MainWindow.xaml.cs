@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -23,6 +24,7 @@ namespace WpfApp
     public partial class MainWindow : Window
     {
         string outputText;
+        ArrayList Instructions;
 
         // variables
         // array of machine code (to pass into run)
@@ -45,23 +47,21 @@ namespace WpfApp
             
             if (lexer.HasError())
             {
-                UpdateOutputBox(Constants.LexerErrors[(int)lexer.error]);
+                UpdateOutputBox(lexer.GetError());
                 return;
             }
+            
+            Generator generator = new Generator();
 
-            UpdateOutputBox(tokenList.ToString());
+            Instructions = generator.Run(tokenList);
 
-            // initialize generator
-            // check if error code
-
-            /*
-            Generator generator = new Generator(tokenList);
             if (generator.HasError())
             {
-                // print error
-                return; // terminate
-            }*/
-
+                UpdateOutputBox(generator.GetError());
+                return;
+            }
+            
+            UpdateOutputBox("SUCCESS");
         }
 
         private void RunButton_Click(object sender, RoutedEventArgs e)

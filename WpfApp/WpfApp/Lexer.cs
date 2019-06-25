@@ -4,8 +4,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-// pass in input string
-
 namespace WpfApp
 {
     class Lexer
@@ -20,25 +18,39 @@ namespace WpfApp
 
         public Lexer()
         {
-            error = Enums.LexerError.None;
+            error = Enums.LexerError.NONE;
 
             tokenList = new TokenList();
             code = "";
             currentSymbol = '\0';
             charIndex = 0;
-            lineNum = 0;
+            lineNum = 1;
         }
 
         public TokenList Run(string inputCode)
         {
+            if(inputCode == "")
+            {
+                error = Enums.LexerError.NO_SOURCE_CODE;
+                return null;
+            }
+
             code = inputCode + '\0';
             currentSymbol = code[0];
 
             while (true)
             {
+                // Terminate loop is an error has been found
+                if (HasError())
+                    break;
+
                 // Remove whitespace (also increments line number)
                 RemoveWhitespace();
-                
+
+                // Terminate loop if end of string is reached
+                if (currentSymbol == '\0')
+                    break;
+
                 // Handle symbol based on its type
                 switch (GetSymbolType(currentSymbol))
                 {
@@ -52,19 +64,9 @@ namespace WpfApp
                         HandleSpecial();
                         break;
                     case (int)Enums.CharacterType.INVALID:
-                        // make error "invalid symbol"
-                        return null;
+                        error = Enums.LexerError.INV_SYM;
+                        break;
                 }
-
-                // Terminate loop is an error has been found
-                if (HasError())
-                    break;
-
-                // Terminate loop if end of string is reached
-                if (currentSymbol == '\0')
-                    break;
-
-                NextSymbol();
             }
 
             return tokenList;
@@ -72,7 +74,12 @@ namespace WpfApp
 
         public bool HasError()
         {
-            return (error != Enums.LexerError.None ? true : false);
+            return (error != Enums.LexerError.NONE ? true : false);
+        }
+
+        public string GetError()
+        {
+            return ("ERROR (" + (int)error + ") : " + Constants.LexerErrors[(int)error]);
         }
 
         private void RemoveWhitespace()
@@ -121,8 +128,8 @@ namespace WpfApp
             {
                 switch (GetSymbolType(currentSymbol))
                 {
-                    case 0:
-                    case 1:
+                    case (int)Enums.CharacterType.ALPHA:
+                    case (int)Enums.CharacterType.DIGIT:
                         if(numAlphanumerics < Constants.MaxIdentSize)
                         {
                             sb.Append(currentSymbol);
@@ -132,20 +139,22 @@ namespace WpfApp
                         }
                         else
                         {
-                            // error
+                            error = Enums.LexerError.NAME_TOO_LONG;
                             return;
                         }
                         break;
-                    case 2:
-                    case 3:
+                    case (int)Enums.CharacterType.SPECIAL:
+                    case (int)Enums.CharacterType.INVALID:
                         continueLooping = false;
                         break;
                 }
             }
 
-            Token newToken = new Token();
-            newToken.lexeme = sb.ToString();
-            newToken.id = Enums.TokenType.identsym;
+            Token newToken = new Token
+            {
+                lexeme = sb.ToString(),
+                id = Enums.TokenType.identsym
+            };
 
             tokenList.Add(newToken);
 
@@ -161,34 +170,37 @@ namespace WpfApp
             {
                 switch (GetSymbolType(currentSymbol))
                 {
-                    case 0:
-                        error = Enums.LexerError.Bad;
+                    case (int)Enums.CharacterType.ALPHA:
+                        error = Enums.LexerError.NONLETTER_VAR_INITIAL;
                         // error
                         return;
-                    case 1:
+                    case (int)Enums.CharacterType.DIGIT:
                         if (numDigits < Constants.MaxNumberSize)
                         {
                             sb.Append(currentSymbol);
                             numDigits++;
+
                             NextSymbol();
                         }
                         else
                         {
-
+                            error = Enums.LexerError.NUM_TOO_LONG;
                             return;
                         }
                         break;
-                    case 2:
-                    case 3:
+                    case (int)Enums.CharacterType.SPECIAL:
+                    case (int)Enums.CharacterType.INVALID:
                         continueLooping = false;
                         break;
                 }
             }
 
-            Token newToken = new Token();
-            newToken.lexeme = sb.ToString();
-            newToken.id = Enums.TokenType.numbersym;
-            
+            Token newToken = new Token
+            {
+                lexeme = sb.ToString(),
+                id = Enums.TokenType.numbersym
+            };
+
             tokenList.Add(newToken);
         }
 
@@ -205,9 +217,12 @@ namespace WpfApp
 
                     if (currentSymbol == '\0')
                     {
-                        // error
+                        error = Enums.LexerError.COMMENT_NOT_CLOSED;
                         return;
                     }
+
+                    if (currentSymbol == '\n')
+                        lineNum++;
 
                     lookaheadSymbol = code[charIndex + 1];
 

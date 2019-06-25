@@ -38,7 +38,18 @@ namespace WpfApp
 
         public enum LexerError
         {
-            None = 1, Bad = 2
+            NONE, NONLETTER_VAR_INITIAL, NAME_TOO_LONG, NUM_TOO_LONG, INV_SYM, COMMENT_NOT_CLOSED, NO_SOURCE_CODE
+        }
+
+        public enum GeneratorError
+        {
+            NONE,
+            EQUAL_NOT_FOLLOWED_BY_NUM,          IDENT_NOT_FOLLOWED_BY_NUM,           RESERVED_NOT_FOLLOWED_BY_IDENT,
+            SEMICOLON_OR_COMMA_MISSING,         SEMICOLON_MISSING, PERIOD_EXPECTED,  ASSIGNMENT_OP_EXPECTED,
+            CALL_NOT_FOLLOWED_BYIDENT,          THEN_EXPECTED,                       SEMICOLON_OR_END_EXPECTED,
+            DO_EXPECTED,                        RELATIONAL_OP_EXPECTED,              RIGHT_PARENTH_MISSING,
+            MISSING_SYMBOL, IDENT_OUTOFSCOPE,   ASSIGNMENT_CONST_PROC_IMPOSSIBLE,    CALL_CONST_VAR_IMPOSSIBLE,
+            WRITE_TO_PROC_IMPOSSIBLE,           READ_TO_CONST_PROC_IMPOSSIBLE
         }
 
         public enum NonTerminal

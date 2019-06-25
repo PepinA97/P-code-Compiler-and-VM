@@ -8,16 +8,49 @@ namespace WpfApp
 {
     class Symbol
     {
-        Enums.TokenType type;
-        String name;
-        int value;
-        int level;
-        int address;
-        Symbol scope;
+        public Enums.TokenType type;
+
+        public Symbol scope;
+
+        public String name;
+
+        public int value;
+        public int level;
+        public int address;
 
         public Symbol()
         {
+            type = Enums.TokenType.nulsym;
 
+            scope = null;
+
+            name = "";
+
+            value = 0;
+            level = 0;
+            address = 0;
+        }
+
+        public Symbol FindSymbol(SymbolTable symbolTable, Symbol scope, string symbolName)
+        {
+            while (true)
+            {
+                foreach (Symbol symbol in symbolTable.GetSymbols())
+                {
+                    if((symbol.scope == scope) && (symbol.name == symbolName))
+                    {
+                        return symbol;
+                    }
+                }
+                if (scope == null)
+                {
+                    return null;
+                }
+                else
+                {
+                    scope = scope.scope;
+                }
+            }
         }
     }
 }

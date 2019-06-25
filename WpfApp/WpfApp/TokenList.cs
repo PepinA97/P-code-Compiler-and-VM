@@ -9,18 +9,18 @@ namespace WpfApp
 {
     class TokenList
     {
-        ArrayList Tokens;
+        ArrayList tokens;
         int iterator;
 
         public TokenList()
         {
-            Tokens = new ArrayList();
+            tokens = new ArrayList();
             iterator = 0;
         }
 
         public void Add(Token token)
         {
-            Tokens.Add(token);
+            tokens.Add(token);
         }
 
         public void NextToken()
@@ -30,7 +30,7 @@ namespace WpfApp
 
         public Token GetCurrentToken()
         {
-            return (Token)Tokens[iterator];
+            return (Token)tokens[iterator];
         }
 
         public Enums.TokenType GetCurrentTokenType()
@@ -42,7 +42,7 @@ namespace WpfApp
         {
             StringBuilder sb = new StringBuilder();
 
-            foreach(Token token in Tokens)
+            foreach(Token token in tokens)
             {
                 sb.Append(token.ToString() + " ");
             }
