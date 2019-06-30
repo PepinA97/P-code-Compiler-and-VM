@@ -9,11 +9,11 @@ namespace WpfApp
 {
     class SymbolTable
     {
-        ArrayList symbols;
+        List<Symbol> symbols;
 
         public SymbolTable()
         {
-            symbols = null;
+            symbols = new List<Symbol>();
         }
 
         public void Add(Symbol symbol)
@@ -21,7 +21,7 @@ namespace WpfApp
             symbols.Add(symbol);
         }
 
-        public ArrayList GetSymbols()
+        public List<Symbol> GetSymbols()
         {
             return symbols;
         }

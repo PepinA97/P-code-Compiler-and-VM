@@ -21,7 +21,7 @@ namespace WpfApp
         {
             StringBuilder sb = new StringBuilder();
 
-            sb.Append(Constants.SymbolNames[(int)id]);
+            sb.Append(id);
 
             if (lexeme != "")
                 sb.Append(" " + lexeme);

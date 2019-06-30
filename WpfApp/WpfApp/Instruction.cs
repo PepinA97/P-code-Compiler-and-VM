@@ -20,5 +20,10 @@ namespace WpfApp
             L = 0;
             M = 0;
         }
+
+        public override string ToString()
+        {
+            return (OP + " " + R + " " + L + " " + M);
+        }
     }
 }

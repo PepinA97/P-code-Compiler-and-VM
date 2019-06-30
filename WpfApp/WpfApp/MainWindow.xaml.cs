@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -18,13 +19,16 @@ using System.Windows.Shapes;
  * Have default text from text file
 */
 
+    // CHANGE ARRAYLISTS TO LISTS<> 
+
 namespace WpfApp
 {
 
     public partial class MainWindow : Window
     {
+        string inputText;
         string outputText;
-        ArrayList Instructions;
+        List<Instruction> instructions;
 
         // variables
         // array of machine code (to pass into run)
@@ -34,8 +38,16 @@ namespace WpfApp
         public MainWindow()
         {
             outputText = "";
+            inputText = File.ReadAllText("Code.txt");
 
             InitializeComponent();
+
+            InputBox.Text = inputText;
+        }
+
+        ~MainWindow()
+        {
+            File.WriteAllText("Code.txt", inputText);
         }
 
         private void CompileButton_Click(object sender, RoutedEventArgs e)
@@ -43,7 +55,7 @@ namespace WpfApp
             
             Lexer lexer = new Lexer();
 
-            TokenList tokenList = lexer.Run(InputBox.Text);
+            TokenList tokenList = lexer.Run(inputText);
             
             if (lexer.HasError())
             {
@@ -53,19 +65,25 @@ namespace WpfApp
             
             Generator generator = new Generator();
 
-            Instructions = generator.Run(tokenList);
+            instructions = generator.Run(tokenList);
+
+            foreach (Instruction instr in instructions)
+                UpdateOutputBox(instr.ToString());
 
             if (generator.HasError())
             {
                 UpdateOutputBox(generator.GetError());
                 return;
             }
-            
-            UpdateOutputBox("SUCCESS");
+
         }
 
         private void RunButton_Click(object sender, RoutedEventArgs e)
         {
+            Machine machine = new Machine();
+
+
+
             // take array of machine code, run and print output
         }
 
@@ -74,6 +92,11 @@ namespace WpfApp
             outputText += text + "\n";
 
             OutputBox.Text = outputText;
+        }
+
+        private void InputBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            inputText = InputBox.Text;
         }
     }
 }

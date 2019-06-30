@@ -9,22 +9,14 @@ namespace WpfApp
     class Constants
     {
 
-        public const int MaxIdentSize   = 16;
-        public const int MaxNumberSize  = 16;
+        public const int MaxIdentSize       = 16;
+        public const int MaxNumberSize      = 16;
+        public const int ReservedWordsOffset = 21;
 
-        public static readonly string[] SymbolNames = {
-            "",              "nulsym",         "identsym",   "numbersym",
-
-            // Special symbols
-            "plussym",       "minussym",
-            "multsym",       "slashsym",  "oddsym",        "eqsym",     "neqsym",
-            "lessym",        "leqsym",    "gtrsym",        "geqsym",    "lparentsym",
-            "rparentsym",    "commasym",  "semicolonsym",  "periodsym", "becomessym",
-
-            // Reserved words
-            "beginsym",      "endsym",    "ifsym",         "thensym",   "whilesym",
-            "dosym",         "callsym",   "constsym",      "varsym",    "procsym",
-            "writesym",      "readsym",   "elsesym"
+        public static readonly string[] ReservedWords = {
+            "begin",      "end",    "if",         "then",   "while",
+            "do",         "call",   "const",      "var",    "procedure",
+            "write",      "read",   "else"
         };
 
         public static readonly string[] LexerErrors = {

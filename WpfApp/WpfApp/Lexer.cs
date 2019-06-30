@@ -81,6 +81,19 @@ namespace WpfApp
         {
             return ("ERROR (" + (int)error + ") : " + Constants.LexerErrors[(int)error]);
         }
+        
+        private Enums.TokenType CheckReservedWords(string lexeme)
+        {
+            for(int i = 0; i < Constants.ReservedWords.Length; i++)
+            {
+                if(Constants.ReservedWords[i] == lexeme)
+                {
+                    return (Enums.TokenType)(i + Constants.ReservedWordsOffset);
+                }
+            }
+
+            return Enums.TokenType.identsym;
+        }
 
         private void RemoveWhitespace()
         {
@@ -150,14 +163,13 @@ namespace WpfApp
                 }
             }
 
-            Token newToken = new Token
-            {
-                lexeme = sb.ToString(),
-                id = Enums.TokenType.identsym
-            };
+            Token newToken = new Token();
+
+            newToken.id = CheckReservedWords(sb.ToString());
+            if (newToken.id == Enums.TokenType.identsym)
+                newToken.lexeme = sb.ToString();
 
             tokenList.Add(newToken);
-
         }
 
         private void HandleDigit()

@@ -9,12 +9,12 @@ namespace WpfApp
 {
     class TokenList
     {
-        ArrayList tokens;
+        List<Token> tokens;
         int iterator;
 
         public TokenList()
         {
-            tokens = new ArrayList();
+            tokens = new List<Token>();
             iterator = 0;
         }
 
