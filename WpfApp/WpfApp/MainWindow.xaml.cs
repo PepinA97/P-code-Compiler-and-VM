@@ -29,12 +29,7 @@ namespace WpfApp
         string inputText;
         string outputText;
         List<Instruction> instructions;
-
-        // variables
-        // array of machine code (to pass into run)
-
-
-        // constructor
+        
         public MainWindow()
         {
             outputText = "";

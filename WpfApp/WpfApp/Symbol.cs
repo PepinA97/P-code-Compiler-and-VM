@@ -31,7 +31,7 @@ namespace WpfApp
             address = 0;
         }
 
-        public Symbol FindSymbol(SymbolTable symbolTable, Symbol scope, string symbolName)
+        public static Symbol FindSymbol(SymbolTable symbolTable, Symbol scope, string symbolName)
         {
             while (true)
             {
