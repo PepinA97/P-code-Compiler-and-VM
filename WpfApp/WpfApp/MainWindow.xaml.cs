@@ -15,12 +15,6 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-/*
- * Have default text from text file
-*/
-
-    // CHANGE ARRAYLISTS TO LISTS<> 
-
 namespace WpfApp
 {
 
@@ -37,7 +31,7 @@ namespace WpfApp
 
             InitializeComponent();
 
-            InputBox.Text = inputText;
+            InputCodeBox.Text = inputText;
         }
 
         ~MainWindow()
@@ -47,7 +41,6 @@ namespace WpfApp
 
         private void CompileButton_Click(object sender, RoutedEventArgs e)
         {
-            
             Lexer lexer = new Lexer();
 
             TokenList tokenList = lexer.Run(inputText);
@@ -70,14 +63,13 @@ namespace WpfApp
                 UpdateOutputBox(generator.GetError());
                 return;
             }
-
         }
 
         private void RunButton_Click(object sender, RoutedEventArgs e)
         {
             Machine machine = new Machine();
 
-
+            //List<int> machineOutput = machine:Run(machineInput);
 
             // take array of machine code, run and print output
         }
@@ -89,9 +81,14 @@ namespace WpfApp
             OutputBox.Text = outputText;
         }
 
-        private void InputBox_TextChanged(object sender, TextChangedEventArgs e)
+        private void InputCodeBox_TextChanged(object sender, TextChangedEventArgs e)
         {
-            inputText = InputBox.Text;
+            inputText = InputCodeBox.Text;
+        }
+
+        private void InputMachineBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+
         }
     }
 }

@@ -14,7 +14,8 @@
             <ColumnDefinition Width="399*"/>
             <ColumnDefinition Width="391*"/>
         </Grid.ColumnDefinitions>
-        <TextBox x:Name="InputBox" TextWrapping="Wrap" Margin="10,54,0,10" AcceptsReturn="True" AcceptsTab="True" TextChanged="InputBox_TextChanged"/>
+        <TextBox x:Name="InputCodeBox" TextWrapping="Wrap" Margin="10,80,0,10" AcceptsReturn="True" AcceptsTab="True" TextChanged="InputCodeBox_TextChanged"/>
+        <TextBox x:Name="InputMachineBox" TextWrapping="Wrap" Margin="10,54,0,0" AcceptsReturn="True" AcceptsTab="True" TextChanged="InputMachineBox_TextChanged" Height="21" VerticalAlignment="Top"/>
         <TextBlock x:Name="OutputBox" TextWrapping="Wrap" Grid.Column="1" Margin="10" Background="#FFEEEEEE"/>
         <Button x:Name="CompileButton" Content="Compile" HorizontalAlignment="Left" VerticalAlignment="Top" Width="120" Margin="10,10,0,0" Height="35" Click="CompileButton_Click"/>
         <Button x:Name="RunButton" Content="Run" HorizontalAlignment="Left" Margin="135,10,0,0" VerticalAlignment="Top" Width="120" Height="35" Click="RunButton_Click"/>

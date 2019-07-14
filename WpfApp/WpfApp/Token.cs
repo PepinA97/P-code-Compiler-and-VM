@@ -10,11 +10,13 @@ namespace WpfApp
     {
         public Enums.TokenType id;
         public string lexeme;
+        public int lineNum;
 
         public Token()
         {
             id = Enums.TokenType.nulsym;
             lexeme = "";
+            lineNum = 0;
         }
 
         public override string ToString()

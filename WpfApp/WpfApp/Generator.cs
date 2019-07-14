@@ -56,7 +56,7 @@ namespace WpfApp
 
         public string GetError()
         {
-            return ("ERROR (" + (int)error + ") : " + Constants.GeneratorErrors[(int)error]);
+            return ("ERROR (" + tokenList.GetCurrentToken().lineNum + " " + tokenList.GetCurrentToken().lexeme + ") : " + Constants.GeneratorErrors[(int)error]);
         }
 
         private int Emit(int OP, int R, int L, int M)
@@ -80,7 +80,7 @@ namespace WpfApp
             Block();
 
             if (error != Enums.GeneratorError.NONE) return;
-            
+
             if(tokenList.GetCurrentTokenType() == Enums.TokenType.periodsym)
             {
                 tokenList.NextToken();
@@ -288,7 +288,7 @@ namespace WpfApp
 
                 tokenList.NextToken();
 
-                if(symbol.type == Enums.TokenType.varsym)
+                if(symbol.type != Enums.TokenType.varsym)
                 {
                     error = Enums.GeneratorError.ASSIGNMENT_CONST_PROC_IMPOSSIBLE;
                     return;
@@ -347,7 +347,7 @@ namespace WpfApp
                     if (error != Enums.GeneratorError.NONE) return;
                 } while (tokenList.GetCurrentTokenType() == Enums.TokenType.semicolonsym);
 
-                if(tokenList.GetCurrentTokenType() == Enums.TokenType.endsym)
+                if(tokenList.GetCurrentTokenType() != Enums.TokenType.endsym)
                 {
                     error = Enums.GeneratorError.SEMICOLON_OR_END_EXPECTED;
                     return;
@@ -454,25 +454,214 @@ namespace WpfApp
             else if (tokenList.GetCurrentTokenType() == Enums.TokenType.writesym)
             {
                 tokenList.NextToken();
+                
+                if (tokenList.GetCurrentTokenType() != Enums.TokenType.identsym)
+                {
+                    error = Enums.GeneratorError.RESERVED_NOT_FOLLOWED_BY_IDENT;
+                    return;
+                }
+
+                Symbol symbol = Symbol.FindSymbol(symbolTable, currentScope, tokenList.GetCurrentToken().lexeme);
+
+                if (symbol == null)
+                {
+                    error = Enums.GeneratorError.IDENT_OUTOFSCOPE;
+                    return;
+                }
+                if (symbol.type == Enums.TokenType.procsym)
+                {
+                    error = Enums.GeneratorError.WRITE_TO_PROC_IMPOSSIBLE;
+                    return;
+                }
 
 
+                if (symbol.type == Enums.TokenType.constsym)
+                {
+                    Emit((int)Enums.OpCode.LIT, currentRegister - 1, 0, symbol.value);
+                }
+                else if (symbol.type == Enums.TokenType.varsym)
+                {
+                    Emit((int)Enums.OpCode.LOD, currentRegister - 1, 0, 2);
+                }
+
+                Emit((int)Enums.OpCode.SIO_WRITE, currentRegister - 1, 0, 2);
+
+                tokenList.NextToken();
             }
         }
 
         private void Condition()
         {
+            if (tokenList.GetCurrentTokenType() == Enums.TokenType.oddsym)
+            {
+                tokenList.NextToken();
+
+                Expression();
+                if (error != Enums.GeneratorError.NONE) return;
+            }
+            else
+            {
+                Expression();
+                if (error != Enums.GeneratorError.NONE) return;
+
+                Enums.TokenType currentTokenType = tokenList.GetCurrentTokenType();
+
+                tokenList.NextToken();
+
+                Expression();
+                if (error != Enums.GeneratorError.NONE) return;
+
+                if (tokenList.GetCurrentTokenType() == Enums.TokenType.eqsym)
+                    Emit((int)Enums.OpCode.EQL, currentRegister - 2, currentRegister - 2, currentRegister - 1);
+                else if (tokenList.GetCurrentTokenType() == Enums.TokenType.neqsym)
+                    Emit((int)Enums.OpCode.NEQ, currentRegister - 2, currentRegister - 2, currentRegister - 1);
+                else if (tokenList.GetCurrentTokenType() == Enums.TokenType.lessym)
+                    Emit((int)Enums.OpCode.LSS, currentRegister - 2, currentRegister - 2, currentRegister - 1);
+                else if (tokenList.GetCurrentTokenType() == Enums.TokenType.leqsym)
+                    Emit((int)Enums.OpCode.LEQ, currentRegister - 2, currentRegister - 2, currentRegister - 1);
+                else if (tokenList.GetCurrentTokenType() == Enums.TokenType.gtrsym)
+                    Emit((int)Enums.OpCode.GTR, currentRegister - 2, currentRegister - 2, currentRegister - 1);
+                else if (tokenList.GetCurrentTokenType() == Enums.TokenType.geqsym)
+                    Emit((int)Enums.OpCode.GEQ, currentRegister - 2, currentRegister - 2, currentRegister - 1);
+                else
+                {
+                    error = Enums.GeneratorError.RELATIONAL_OP_EXPECTED;
+                    return;
+                }
+
+                currentRegister--;
+            }
         }
 
         private void Expression()
         {
+            if ((tokenList.GetCurrentTokenType() == Enums.TokenType.plussym) || (tokenList.GetCurrentTokenType() == Enums.TokenType.minussym))
+            {
+                Enums.TokenType op = tokenList.GetCurrentTokenType();
+
+                tokenList.NextToken();
+
+                Term();
+                if (error != Enums.GeneratorError.NONE) return;
+
+                if(op == Enums.TokenType.minussym)
+                {
+                    Emit((int)Enums.OpCode.NEG, currentRegister - 1, currentRegister - 1, 0);
+                }
+            }
+            else
+            {
+                Term();
+                if (error != Enums.GeneratorError.NONE) return;
+            }
+
+            while ((tokenList.GetCurrentTokenType() == Enums.TokenType.plussym) || (tokenList.GetCurrentTokenType() == Enums.TokenType.minussym))
+            {
+                Enums.TokenType op = tokenList.GetCurrentTokenType();
+
+                tokenList.NextToken();
+
+                Term();
+                if (error != Enums.GeneratorError.NONE) return;
+
+                if (op == Enums.TokenType.plussym)
+                {
+                    Emit((int)Enums.OpCode.ADD, currentRegister - 2, currentRegister - 2, currentRegister - 1);
+                }
+                else
+                {
+                    Emit((int)Enums.OpCode.SUB, currentRegister - 2, currentRegister - 2, currentRegister - 1);
+                }
+
+                currentRegister--;
+            }
         }
 
         private void Term()
         {
+            Factor();
+            if (error != Enums.GeneratorError.NONE) return;
+
+            while ((tokenList.GetCurrentTokenType() == Enums.TokenType.multsym) || (tokenList.GetCurrentTokenType() == Enums.TokenType.slashsym))
+            {
+                Enums.TokenType op = tokenList.GetCurrentTokenType();
+
+                tokenList.NextToken();
+
+                Factor();
+                if (error != Enums.GeneratorError.NONE) return;
+
+                if (op == Enums.TokenType.multsym)
+                {
+                    Emit((int)Enums.OpCode.MUL, currentRegister - 2, currentRegister - 2, currentRegister - 1);
+                }
+                else
+                {
+                    Emit((int)Enums.OpCode.DIV, currentRegister - 2, currentRegister - 2, currentRegister - 1);
+                }
+
+                currentRegister--;
+            }
         }
 
         private void Factor()
         {
+            if (tokenList.GetCurrentTokenType() == Enums.TokenType.identsym)
+            {
+
+                Symbol symbol = Symbol.FindSymbol(symbolTable, currentScope, tokenList.GetCurrentToken().lexeme);
+
+                if (symbol == null)
+                {
+                    error = Enums.GeneratorError.IDENT_OUTOFSCOPE;
+                    return;
+                }
+
+                if (symbol.type == Enums.TokenType.constsym)
+                {
+                    Emit((int)Enums.OpCode.LIT, currentRegister, 0, symbol.value);
+                }
+                else if (symbol.type == Enums.TokenType.varsym)
+                {
+                    Emit((int)Enums.OpCode.LOD, currentRegister, currentLevel - symbol.level, symbol.address);
+                }
+
+                currentRegister++;
+
+                tokenList.NextToken();
+
+                return;
+            }
+            else if (tokenList.GetCurrentTokenType() == Enums.TokenType.numbersym)
+            {
+                Emit((int)Enums.OpCode.LIT, currentRegister, 0, int.Parse(tokenList.GetCurrentToken().lexeme));
+
+                currentRegister++;
+
+                tokenList.NextToken();
+
+                return;
+            }
+            else if (tokenList.GetCurrentTokenType() == Enums.TokenType.lparentsym)
+            {
+                tokenList.NextToken();
+
+                Expression();
+                if (error != Enums.GeneratorError.NONE) return;
+
+                if (tokenList.GetCurrentTokenType() != Enums.TokenType.rparentsym)
+                {
+                    error = Enums.GeneratorError.RIGHT_PARENTH_MISSING;
+                    return;
+                }
+
+                tokenList.NextToken();
+            }
+            else
+            {
+                error = Enums.GeneratorError.MISSING_SYMBOL;
+                return;
+            }
         }
     }
 }

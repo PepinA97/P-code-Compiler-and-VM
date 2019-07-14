@@ -168,6 +168,7 @@ namespace WpfApp
             newToken.id = CheckReservedWords(sb.ToString());
             if (newToken.id == Enums.TokenType.identsym)
                 newToken.lexeme = sb.ToString();
+            newToken.lineNum = lineNum;
 
             tokenList.Add(newToken);
         }
@@ -210,7 +211,8 @@ namespace WpfApp
             Token newToken = new Token
             {
                 lexeme = sb.ToString(),
-                id = Enums.TokenType.numbersym
+                id = Enums.TokenType.numbersym,
+                lineNum = lineNum
             };
 
             tokenList.Add(newToken);
@@ -318,7 +320,8 @@ namespace WpfApp
 
             Token newToken = new Token
             {
-                id = id
+                id = id,
+                lineNum = lineNum
             };
 
             tokenList.Add(newToken);
