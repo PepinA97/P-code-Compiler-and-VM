@@ -12,6 +12,8 @@ namespace WpfApp
         public const int MaxIdentSize       = 16;
         public const int MaxNumberSize      = 16;
         public const int ReservedWordsOffset = 21;
+        public const int RegisterFileSize = 32;
+        public const int StackSize = 512;
 
         public static readonly string[] ReservedWords = {
             "begin",      "end",    "if",         "then",   "while",

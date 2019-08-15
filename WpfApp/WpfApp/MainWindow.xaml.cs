@@ -20,30 +20,32 @@ namespace WpfApp
 
     public partial class MainWindow : Window
     {
-        string inputText;
+        string inputCodeText;
+        string input;
         string outputText;
         List<Instruction> instructions;
         
         public MainWindow()
         {
+            inputCodeText = File.ReadAllText("Code.txt");
+            input = "";
             outputText = "";
-            inputText = File.ReadAllText("Code.txt");
 
             InitializeComponent();
 
-            InputCodeBox.Text = inputText;
+            InputCodeBox.Text = inputCodeText;
         }
 
         ~MainWindow()
         {
-            File.WriteAllText("Code.txt", inputText);
+            File.WriteAllText("Code.txt", inputCodeText);
         }
 
         private void CompileButton_Click(object sender, RoutedEventArgs e)
         {
             Lexer lexer = new Lexer();
 
-            TokenList tokenList = lexer.Run(inputText);
+            TokenList tokenList = lexer.Run(inputCodeText);
             
             if (lexer.HasError())
             {
@@ -54,10 +56,7 @@ namespace WpfApp
             Generator generator = new Generator();
 
             instructions = generator.Run(tokenList);
-
-            foreach (Instruction instr in instructions)
-                UpdateOutputBox(instr.ToString());
-
+            
             if (generator.HasError())
             {
                 UpdateOutputBox(generator.GetError());
@@ -67,11 +66,25 @@ namespace WpfApp
 
         private void RunButton_Click(object sender, RoutedEventArgs e)
         {
+            string[] tokens = input.Split(' ');
+            List<int> machineInput = new List<int>();
+
+            foreach(var str in tokens)
+            {
+                machineInput.Add(int.Parse(str));
+            }
+            
             Machine machine = new Machine();
 
-            //List<int> machineOutput = machine:Run(machineInput);
+            List<int> machineOutput = machine.Run(instructions, machineInput);
 
-            // take array of machine code, run and print output
+            string output = "";
+            foreach(var i in machineOutput)
+            {
+                output += (i + " ");
+            }
+
+            UpdateOutputBox(output);
         }
 
         private void UpdateOutputBox(string text)
@@ -83,12 +96,12 @@ namespace WpfApp
 
         private void InputCodeBox_TextChanged(object sender, TextChangedEventArgs e)
         {
-            inputText = InputCodeBox.Text;
+            inputCodeText = InputCodeBox.Text;
         }
 
         private void InputMachineBox_TextChanged(object sender, TextChangedEventArgs e)
         {
-
+            input = InputMachineBox.Text;
         }
     }
 }
